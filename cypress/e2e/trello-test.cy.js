@@ -4,7 +4,7 @@ describe('Testes de API do Trello', () => {
 
     cy.request({
       method: 'POST',
-      url: `https://api.trello.com/1/boards/?name=${boardName}&key=${Cypress.env('API_KEY')}&token=${Cypress.env('TOKEN')}`
+      url: `/boards/?name=${boardName}&key=${Cypress.env('API_KEY')}&token=${Cypress.env('TOKEN')}`
     }).then(response => {
       expect(response.status).to.eq(200);
       expect(response.body.name).to.eq(boardName);
@@ -28,7 +28,7 @@ describe('Testes de API do Trello', () => {
         // Cria um novo card na lista
         cy.request({
           method: 'POST',
-          url: `https://api.trello.com/1/cards?idList=${listId}&key=${Cypress.env('API_KEY')}&token=${Cypress.env('TOKEN')}`
+          url: `/cards?idList=${listId}&key=${Cypress.env('API_KEY')}&token=${Cypress.env('TOKEN')}`
         }).then(responseCard => {
           console.log(responseCard)
           expect(responseCard.status).to.eq(200);
