@@ -12,7 +12,7 @@ describe('Testes de API do Trello', () => {
   it('Cadastrar um novo card', () => {
     const listName = 'Minha Lista de Teste';
 
-    cy.getMyBoards().then(responseBoards => {
+    cy.getMyBoard().then(responseBoards => {
       const boardId = responseBoards[0].id; // Pega o ID do Board criado no teste anterior
 
       // Cria uma nova lista no board
@@ -32,7 +32,7 @@ describe('Testes de API do Trello', () => {
   });
 
   it('Excluir um card', () => {
-    cy.getMyBoards().then(responseBoards => {
+    cy.getMyBoard().then(responseBoards => {
       const boardId = responseBoards[0].id; // Pega o ID do Board criado no teste anterior
 
       // Pega as listas do board
@@ -42,13 +42,13 @@ describe('Testes de API do Trello', () => {
 
           // Pega os cards da lista
           cy.request('GET', `/lists/${listId}/cards?key=${Cypress.env('API_KEY')}&token=${Cypress.env('TOKEN')}`)
-            .then(responseCards => {
-              const cardId = responseCards.body[0].id; // Pega o ID do primeiro card da lista
+            .then(responseGetCards => {
+              const cardId = responseGetCards.body[0].id; // Pega o ID do primeiro card da lista
 
               // Exclui o card
               cy.request('DELETE', `/cards/${cardId}?key=${Cypress.env('API_KEY')}&token=${Cypress.env('TOKEN')}`)
-                .then(responseCards => {
-                  expect(responseCards.status).to.eq(200);
+                .then(responseDeleteCards => {
+                  expect(responseDeleteCards.status).to.eq(200);
                 })
             })
        })
@@ -56,7 +56,7 @@ describe('Testes de API do Trello', () => {
   });
 
   it('Excluir um board', () => {
-    cy.getMyBoards().then(response => {
+    cy.getMyBoard().then(response => {
       const boardId = response[0].id;
 
       // Exclui o board

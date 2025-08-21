@@ -28,34 +28,84 @@ API_KEY=your_api_key
 TOKEN=your_token
 ```
 ## Estratégia de Teste
-- Validação de Status Code: Garantir respostas esperadas (200, 400, 404, ...)
+### Mapeamento de Endpoints e Sequência de Execução
+
+A chave para uma boa automação de testes de API é entender a sequência de ações. Não podemos excluir um card que não existe, ou um board que não foi criado. O fluxo de teste deve seguir a lógica de negócios da API.
+
+* **Ação de Teste:** Cadastrar um Board
+  * **Endpoint:**``` POST /1/boards```
+  * **Necessário:** Nome do board (name).
+  * **Resultado Esperado:** Resposta 200 OK, com um objeto board contendo um id único.
 
 
+* **Ação de Teste:** Cadastrar um Card
+  * **Endpoint:** ```POST /1/cards```
+  * **Necessário:** Nome do card (name) e o id da lista (idList). Para obter o id da lista, é preciso primeiro criar um board (que vem com listas padrão) ou buscar a lista.
+  * **Resultado Esperado:** Resposta 200 OK, com um objeto card contendo um id único.
+
+
+* **Ação de Teste:** Excluir um Card
+  * **Endpoint:** ```DELETE /1/cards/{id}```
+  * **Necessário:** O id do card que foi criado no passo anterior.
+  * **Resultado Esperado:** Resposta 200 OK.
+
+
+* **Ação de Teste:** Excluir um Board
+  * **Endpoint:** ```DELETE /1/boards/{id}```
+  * **Necessário:** O id do board que foi criado no primeiro passo.
+  * **Resultado Esperado:** Resposta 200 OK.
+
+### Sequência Lógica de Testes (Fluxo Ideal):
+
+1. **Criação do Board:** ```POST /1/boards```
+    * Salvar o id do board e o id da lista padrão (idList) para uso futuro.
+
+
+2. **Criação do Card:** ```POST /1/cards```
+    * Usar o id da lista (idList) obtido no passo anterior.
+    * Salvar o id do card para uso futuro.
+
+
+3. **Exclusão do Card:** ```DELETE /1/cards/{id}```
+    * Usar o id do card salvo.
+
+
+4. **Exclusão do Board:** ```DELETE /1/boards/{id}```
+    * Usar o id do board salvo.
+
+
+5. **Sanity Check:** Após a exclusão, você pode adicionar um GET para verificar se os recursos realmente foram removidos. Por exemplo:
+    * ```GET /1/cards/{id}``` (deve retornar 404 - Not Found).
+    * ```GET /1/boards/{id}``` (deve retornar 404 - Not Found).
+
+### Mapa Mental da Estratégia de Testes
+```
+Automação Trello API
+│
+├── Autenticação
+│   └── API Key & Token
+│
+├── Testes CRUD
+│   ├── Criar Board
+│   │   └── Salvar idBoard
+│   ├── Criar Lista
+│   │   └── Salvar idList
+│   ├── Criar Card
+│   │   └── Salvar idCard
+│   ├── Excluir Card
+│   └── Excluir Board
+│
+└── Validações
+├── Status Code
+├── Estrutura JSON
+└── Confirmação de Exclusão
+```
 ## Casos de Teste
-### 1. Criação de um novo board
-- Enviar uma requisição POST para `/boards/`
-- Validar resposta (status 200)
-- Validar se o nome do board retornado corresponde ao enviado
 
-### 2. Criação de um card em um board
-- Envia uma requisção GET para `/members/me/boards` para obter o ID do board criado anteriormente
-- Cria uma lista no board enviando uma requisição POST para `/lists` e guarda o ID da lista
-- Enviar uma requisição POST para `/cards`
-- Validar que o card foi criado com sucesso (status 200)
-- Validar criação do card no board correto
-- Validar estrutura do JSON retornado
-
-### 3. Exclusão de um card
-- Envia uma requisção GET para `/members/me/boards` para obter o ID do board criado anteriormente
-- Envia uma requisição GET para `/lists` para obter o ID da lista criada antiormente
-- Envia uma requisição GET para `/cards` para obter o ID do card criado anteriormente
-- Enviar uma requisição DELETE para `/cards/{cardId}`
-- Validar que o card foi excluído com sucesso (status 200)
-
-### 4. Exclusão de um board
-- Envia uma requisção GET para `/members/me/boards` para obter o ID do board criado anteriormente
-- Enviar uma requisição DELETE para `/boards/{ID}`
-- Validar resposta (status 200)
+1. Cadastrar um novo board
+2. Cadastrar um card
+3. Excluir um card
+4. Excluir um board
 
 
 ## Executando os Testes
