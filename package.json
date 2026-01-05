@@ -2,7 +2,7 @@
   "name": "cypress_project",
   "version": "1.0.0",
   "devDependencies": {
-    "cypress": "^14.4.0"
+    "cypress": "^15.8.1"
   },
   "scripts": {
     "cypress:open": "cypress open",
